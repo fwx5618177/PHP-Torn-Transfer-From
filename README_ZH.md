@@ -1,6 +1,6 @@
 # 【PHP】Torn Transfer from 的实现
 
-在 PHP 中实现 TRON 的 "Transfer from" 功能，需要与 TRON 区块链进行交互。一个常见的方法是使用 TRON 的官方 PHP API 或者其他第三方库。
+在 PHP 中实现 TRON 的 "Transfer from" 功能，需要与 TRON 区块链进行交互。一个常见的方法是使用 TRON 的官方 PHP API 或者其他第三方库。[项目参考](https://github.com/fwx5618177/PHP-Torn-Transfer-From)
 
 本文是一个使用 TRONLink 的示例，TRONLink 是 TRON 的官方钱包，允许在网页上与 TRON 区块链交互。
 
