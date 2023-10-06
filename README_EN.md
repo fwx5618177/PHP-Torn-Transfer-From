@@ -1,27 +1,27 @@
-# 【PHP】TRON の "Transfer from" の実装
+# 【PHP】Implementation of TRON "Transfer from"
 
-PHP で TRON の "Transfer from" 機能を実装するには、TRON ブロックチェーンとのインタラクションが必要です。一般的なアプローチは、TRON の公式 PHP API または他のサードパーティのライブラリを使用する方法です。[参照](https://github.com/fwx5618177/PHP-Torn-Transfer-From)
+Implementing TRON's "Transfer from" functionality in PHP requires interaction with the TRON blockchain. A common approach involves using TRON’s official PHP API or other third-party libraries.[Reference](https://github.com/fwx5618177/PHP-Torn-Transfer-From)
 
-本記事は、ウェブページ上で TRON ブロックチェーンとのインタラクションを可能にする TRON の公式ウォレット、TRONLink を使用した例を提供しています。
+This article provides an example using TRONLink, the official wallet of TRON that enables interaction with the TRON blockchain on web pages.
 
-**TRONLink とは**:
+**What is TRONLink**:
 
-TRONLink は、ウェブページ上で TRON ブロックチェーンとのインタラクションを可能にする TRON の公式ウォレットです。TRONLink には、Chrome 拡張バージョンとウェブバージョンの 2 つのバージョンがあります。本記事では、ウェブバージョンを使用しています。
+TRONLink is the official wallet of TRON, facilitating interactions with the TRON blockchain on web pages. There are two versions of TRONLink: a Chrome extension version and a web version. This article uses the web version.
 
-## 2. 基本セットアップ
+## 2. Basic Setup
 
-1. [Composer](https://getcomposer.org/)をインストールする
-2. tronlink/php-tronlink の依存関係をインストールする
+1. Install [Composer](https://getcomposer.org/)
+2. Install tronlink/php-tronlink dependency
 
 ```bash
 composer require iexbase/tron-api
 ```
 
-## 3. 実装手順
+## 3. Implementation Steps
 
-### 3.1. Transfer From 機能の実装 - 簡単な例
+### 3.1. Implementing Transfer From Functionality - A Simple Example
 
-送信者のプライベートキーを設定し、受信者のアドレスと転送金額を指定して、転送操作を実行します。最後に転送結果を出力します。
+We set the sender's private key, specify the recipient's address and transfer amount, execute the transfer operation, and finally print the transfer result.
 
 ```php
 <?php
@@ -30,30 +30,30 @@ require 'vendor/autoload.php';
 
 use IEXBase\TronAPI\Tron;
 
-// Tronオブジェクトを初期化
+// Initialize Tron object
 $tron = new Tron();
 
-// 送信者のプライベートキーを設定
+// Set the sender's private key
 $tron->setPrivateKey('your-private-key-here');
 
-// 受信者のアドレスと転送金額を指定
+// Specify the recipient's address and transfer amount
 $toAddress = 'TRON-receiver-address';
-$amount = 100;  // 単位はTRXの最小単位（sun）、1 TRX = 1,000,000 sun
+$amount = 100;  // The unit is the smallest unit of TRX (sun), 1 TRX = 1,000,000 sun
 
-// 転送操作を実行
+// Execute the transfer operation
 try {
     $transaction = $tron->getTransactionBuilder()->sendTrx($toAddress, $amount, $tron->address);
     $signedTransaction = $tron->signTransaction($transaction);
     $result = $tron->sendRawTransaction($signedTransaction);
 
-    // 結果を印刷
+    // Print the result
     print_r($result);
 } catch (Exception $e) {
-    echo "エラー: " . $e->getMessage();
+    echo "Error: " . $e->getMessage();
 }
 ```
 
-### 3.2 TRON のスマートコントラクトアドレスを介して TRX または TRC10 トークンを送信する
+### 3.2 Sending TRX or TRC10 Tokens via a TRON Smart Contract Address
 
 ```php
 <?php
@@ -82,7 +82,7 @@ class TronTransaction
             $result = $this->tron->sendRawTransaction($signedTransaction);
             return $result;
         } catch (Exception $e) {
-            return "エラー: " . $e->getMessage();
+            return "Error: " . $e->getMessage();
         }
     }
 
@@ -94,53 +94,53 @@ class TronTransaction
             $result = $this->tron->sendRawTransaction($signedTransaction);
             return $result;
         } catch (Exception $e) {
-            return "エラー: " . $e->getMessage();
+            return "Error: " . $e->getMessage();
         }
     }
 }
 
-// 新しい TronTransaction インスタンスを作成する
-$privateKey = 'your-private-key-here'; // あなたのプライベートキーに置き換えてください
+// Create a new TronTransaction instance
+$privateKey = 'your-private-key-here'; // Replace with your private key
 $tronTransaction = new TronTransaction($privateKey);
 $sendAddress = 'send-address';
 
-// 指定されたアドレスに TRX を送信する
-// 受信者のアドレスと送信量を設定する
-$trxReceiverAddress = 'receiver-address-for-TRX'; // 'receiver-address-for-TRX' を実際の TRX 受信アドレスに置き換えてください
-$result = $tronTransaction->sendTRX($trxReceiverAddress, 100); // 金額を指定する
+// Send TRX to a specific address
+// Set the recipient's address and the sending amount
+$trxReceiverAddress = 'receiver-address-for-TRX'; // Replace 'receiver-address-for-TRX' with the actual TRX receiving address
+$result = $tronTransaction->sendTRX($trxReceiverAddress, 100); // Specify the amount
 print_r($result);
 
-// 指定されたアドレスに TRC10 トークンを送信する
-// トークンのコントラクトアドレス、受信者のアドレス、送信量を設定する
-$tokenReceiverAddress = 'receiver-address-for-Token'; // 'receiver-address-for-Token' を実際のトークン受信アドレスに置き換えてください
-$tokenResult = $tronTransaction->sendToken($sendAddress, $tokenReceiverAddress, 100); // 金額を指定する
+// Send TRC10 tokens to a specific address
+// Set the token's contract address, the recipient's address, and the sending amount
+$tokenReceiverAddress = 'receiver-address-for-Token'; // Replace 'receiver-address-for-Token' with the actual token receiving address
+$tokenResult = $tronTransaction->sendToken($sendAddress, $tokenReceiverAddress, 100); // Specify the amount
 print_r($tokenResult);
 ```
 
-- `receiver-address-for-TRX` は TRX を受け取る TRON アドレスで、TRON ブロックチェーンネットワークのネイティブトークンです。
-- `receiver-address-for-Token` は TRC10 トークンを受け取る TRON アドレスで、TRC10 は TRON ブロックチェーン上のトークン標準で、Ethereum の ERC20 に似ています。
+- `receiver-address-for-TRX` is the TRON address for receiving TRX, which is the native cryptocurrency of the TRON blockchain network.
+- `receiver-address-for-Token` is the TRON address for receiving TRC10 tokens. TRC10 is a token standard on the TRON blockchain, similar to Ethereum's ERC20.
 
-### 3.3. TRON のスマートコントラクトアドレスを通じて TRC20 トークンを送信する
+### 3.3 Sending TRC20 Tokens Through TRON’s Smart Contract Address
 
 ```php
 /**
- * TRC20トークンを送信する
+ * Send TRC20 Tokens
  *
- * @param string $contractAddress TRC20トークンのコントラクトアドレス
- * @param string $toAddress トークンの受信者のTRONアドレス
- * @param int $amount 送信するトークンの数量（トークンの小数桁数に応じて計算され、例：トークンが6桁の小数点を持つ場合、1トークンは1000000として表記する必要があります）
- * @return array 取引の結果を返す
+ * @param string $contractAddress The contract address of the TRC20 token
+ * @param string $toAddress The TRON address to receive the tokens
+ * @param int $amount The amount of tokens to send (calculated based on the token's decimal places, e.g., 1 token might need to be written as 1000000 if the token has 6 decimal places)
+ * @return array Returns the result of the transaction
  */
 public function sendTRC20($contractAddress, $toAddress, $amount)
 {
-    // 金額を検証し、負でないことを確認します。金額が0であることは許可されています。
+    // Validate the amount to ensure it's not negative. Zero amount is allowed.
     if ($amount < 0) {
-        throw new Exception("金額は負であってはなりません。");
+        throw new Exception("The amount should not be negative.");
     }
 
-    // スマートコントラクトをトリガーする取引を作成
-    // ここで、TRC20コントラクトの `transfer` メソッドを呼び出してトークンを送信します
-    // パラメータは、受信者のアドレスと送信数量を含みます
+    // Create a transaction to trigger the smart contract
+    // Here, the ‘transfer’ method of the TRC20 contract is called to send tokens
+    // The parameters include the receiver’s address and the amount to send
     $transaction = $this->tron->getTransactionBuilder()->triggerSmartContract(
         $contractAddress,
         'transfer(address,uint256)',
@@ -158,65 +158,65 @@ public function sendTRC20($contractAddress, $toAddress, $amount)
         $this->tron->address
     );
 
-    // 取引に署名する
+    // Sign the transaction
     $signedTransaction = $this->tron->signTransaction($transaction['transaction']);
 
-    // 署名済みの取引を送信する
+    // Send the signed transaction
     $response = $this->tron->sendRawTransaction($signedTransaction);
 
     return $response;
 }
 
-// 新しいTronTransactionインスタンスを作成する
-$privateKey = 'your-private-key-here'; // あなたのプライベートキーでこれを置き換えます
+// Create a new TronTransaction instance
+$privateKey = 'your-private-key-here'; // Replace with your private key
 $tronTransaction = new TronTransaction($privateKey);
 
-// TRC20コントラクトアドレス、受信者のアドレス、および送信するトークンの数量
-$contractAddress = 'TRC20-contract-address-here'; // 実際のTRC20コントラクトアドレスでこれを置き換えます
-$toAddress = 'receiver-address-here'; // 受信者のTRONアドレスでこれを置き換えます
-$amount = 100; // 送信するトークンの数量（注：数量はトークンの小数桁数に応じて調整する必要があります）
+// TRC20 contract address, receiver address, and amount of tokens to send
+$contractAddress = 'TRC20-contract-address-here'; // Replace with the actual TRC20 contract address
+$toAddress = 'receiver-address-here'; // Replace with the receiver’s TRON address
+$amount = 100; // The amount of tokens to send (note: this may need to be adjusted according to the token’s decimal places)
 
-// TRC20トークンを送信する
+// Send TRC20 tokens
 $response = $tronTransaction->sendTRC20($contractAddress, $toAddress, $amount);
 
-// レスポンスを印刷する
+// Print the response
 print_r($response);
 ```
 
-このセクションでは、TRON のスマートコントラクトアドレスを通じて TRC20 トークンを送信する方法について説明します。`sendTRC20`というメソッドが定義され、そのメソッドでは TRC20 トークンのコントラクトアドレス、トークンの受信者の TRON アドレス、送信するトークンの数量というパラメータが必要となります。そして、金額が負でないことを検証します。0 の金額も許可されます。
+In this section, a method for sending TRC20 tokens using a smart contract on the TRON blockchain is described. The method `sendTRC20` is defined to carry out this operation. The contract address of the TRC20 token, the recipient's TRON address, and the amount of tokens to be sent are the parameters needed. The amount is validated to ensure it is not negative. Zero amount is also acceptable.
 
-スマートコントラクトをトリガーする取引を作成し、TRC20 コントラクトの `transfer` メソッドを呼び出してトークンを送信します。取引に署名した後、署名済みの取引を送信し、レスポンスを返します。
+A transaction is created to trigger the smart contract, and the `transfer` method of the TRC20 contract is specifically invoked to send the tokens. After signing the transaction, it is then sent, and the response is returned.
 
-プライベートキーを使用して新しい`TronTransaction`インスタンスを作成し、TRC20 コントラクトアドレス、受信者のアドレス、送信するトークンの数量を指定します。`sendTRC20`メソッドを呼び出して取引を実行し、レスポンスを印刷します。
+A new instance of `TronTransaction` is created, and the private key is set. The TRC20 contract address, the receiver's address, and the amount of tokens to send are specified before calling the `sendTRC20` method to execute the transaction. The response is then printed out.
 
-### 3.4. "代理支払い"（ガス料金スポンサーシップ）または "トランザクション委託"
+### 3.4. "Proxy Pay" (Gas Fee Sponsorship) or "Transaction Delegation"
 
-代理支払い（スポンサードトランザクション）: これは、アカウント A がアカウント C の取引のエネルギーまたはガス料金を支払うことを可能にします。これにより、アカウント C は TRX や他のネイティブトークンを持っていなくても取引を実行できます。
-シナリオ: ユーザー体験を単純化するシーンでよく見られ、dApps のような場面で、ユーザーが取引費用を支払うのに十分な暗号通貨を持っていない、または開発者がユーザーを引き付けて保持し、取引費用を支払って負担を軽減したい場合などです。
+Proxy Pay (Sponsored Transactions): This allows one account (Account A) to pay for the energy or gas fees of another account (Account C) for executing transactions. As a result, Account C can carry out transactions without having TRX or other native tokens.
+Scenario: This is common in scenarios that aim to simplify user experience, such as in dApps, where users might not have enough cryptocurrency to pay for transaction fees, or developers want to attract and retain users by alleviating their burden by paying for their transaction fees.
 
-このモードは、異なるブロックチェーンで異なる実装と名前を持っています。例えば、Ethereum には、ユーザーが取引時にガス料金を支払わなくても他の人やエンティティに支払わせる「ガスステーションネットワーク」（GSN）というシステムがあります。
+This mode has different implementations and names on different blockchains. For instance, on Ethereum, there's a system called "Gas Station Network" (GSN) that allows users not to pay gas fees during transactions, as it's covered by others or entities.
 
 ```php
 /**
- * TRC20 代理支払い: アカウントAのエネルギーを使用して、アカウントCがアカウントBに送金する
+ * TRC20 Proxy Pay: Uses Account A's energy to allow Account C to transfer to Account B
  *
- * @param string $accountA 秘密鍵 - 取引の署名とエネルギー料金の支払いに使用する
- * @param string $accountC 契約アドレス - トークンがこのアドレスから送られる
- * @param string $accountB 受信アドレス - トークンがこのアドレスに送られる
- * @param int $amount 送金額
- * @return array 取引結果を返す
+ * @param string $accountA Private Key - Used for signing the transaction and paying energy costs
+ * @param string $accountC Contract Address - Tokens will be transferred from this address
+ * @param string $accountB Receiving Address - Tokens will be transferred to this address
+ * @param int $amount Transfer Amount
+ * @return array Returns transaction results
  */
 public function sendByDelegation($accountA, $accountC, $accountB, $amount)
 {
     try {
-        // アカウントAの秘密鍵を設定
+        // Set the private key of Account A
         $this->tron->setPrivateKey($accountA);
 
-        // アカウントCの契約送金をトリガする取引を作成
-        // 注: ここでは適切な契約方法とパラメータが必要です
+        // Create a transaction that triggers the transfer of Account C's contract
+        // Note: Appropriate contract methods and parameters are needed here
         $transaction = $this->tron->getTransactionBuilder()->triggerSmartContract(
             $accountC,
-            'transfer(address,address,uint256)',  // ここでは具体的な契約方法とパラメータのフォーマットが必要です
+            'transfer(address,address,uint256)',  // Specific contract methods and parameter formats are needed here
             '0',
             [
                 ['type' => 'address', 'value' => $accountC],
@@ -226,10 +226,10 @@ public function sendByDelegation($accountA, $accountC, $accountB, $amount)
             $this->tron->address
         );
 
-        // 取引に署名
+        // Sign the transaction
         $signedTransaction = $this->tron->signTransaction($transaction['transaction']);
 
-        // 署名済みの取引を送信
+        // Send the signed transaction
         $result = $this->tron->sendRawTransaction($signedTransaction);
 
         return $result;
@@ -239,40 +239,38 @@ public function sendByDelegation($accountA, $accountC, $accountB, $amount)
 }
 ```
 
-このコードスニペットでは、アカウント A のエネルギーを使用して、アカウント C がアカウント B にトークンを送る TRC20 代理支払いを実行する方法を示しています。これは、TRX や他のネイティブトークンを持っていないユーザーや、dApp プロバイダーがユーザーの取引料を支払って支援したい場合に役立ちます。これは、ユーザーがガス料金を支払
+In this section, a PHP example is provided, demonstrating how to use one account's energy to pay for the transaction fees of another account on the TRON blockchain, facilitating users without enough cryptocurrency or those who the dApp providers want to sponsor by paying their transaction fees. This form of transaction is likened to the Gas Station Network on the Ethereum blockchain where users' gas fees can be sponsored by another party.
 
-わずに他のパーティに支払わせる Ethereum ブロックチェーンのガスステーションネットワークに似ています。
+### 3.5. TRC20 ABI
 
-### 3.5. TRC20 の ABI
+For further details, refer to the following [ABI] section.
 
-詳細は、以下の[ABI]を参照してください。
+In practice, when triggering a smart contract, the contract's ABI (Application Binary Interface) information is required to correctly encode and decode contract calls and responses. This can be accomplished using related APIs on the TRON network or other means.
 
-現実的なシチュエーションでは、スマートコントラクトをトリガーする際に、コントラクトの ABI（Application Binary Interface）情報が必要になり、コントラクトの呼び出しと応答を正確にエンコードおよびデコードすることができます。これは、TRON ネットワーク上の関連 API または他の方法を使用して完了することができます。
-
-以下の内容を更新:
+Updated content below:
 
 ```php
     /**
-     * TRC20 トークンを送信する
+     * Send TRC20 Tokens
      *
-     * @param string $contractAddress TRC20 トークンのコントラクトアドレス
-     * @param string $toAddress トークンを受け取る TRON アドレス
-     * @param int $amount 送信するトークンの数量（トークンの小数桁に応じて計算され、例えば、トークンが6桁の小数を持つ場合、1 トークンは 1000000 として記述する必要があります）
-     * @return array トランザクションの結果を返す
+     * @param string $contractAddress The contract address of the TRC20 token
+     * @param string $toAddress The TRON address to receive the tokens
+     * @param int $amount The amount of tokens to send (calculated according to the token's decimal places, e.g., 1 token may need to be written as 1000000 if the token has 6 decimal places)
+     * @return array Returns the transaction result
      */
     public function sendTRC20($contractAddress, $toAddress, $amount)
     {
-        // 金額を検証して、負でないことを確認します。金額が0であることは許可されます。
+        // Validate the amount to ensure it's not negative. An amount of 0 is permissible.
         if ($amount < 0) {
-            throw new Exception("金額は負であってはなりません。");
+            throw new Exception("The amount should not be negative.");
         }
 
-        // コントラクトの ABI を取得する
+        // Obtain the contract's ABI
         $contractABI = $this->getContractABI($contractAddress);
 
-        // スマートコントラクトをトリガーするトランザクションを作成します
-        // ここでは TRC20 コントラクトの `transfer` メソッドを呼び出してトークンを送信します
-        // パラメータには受信者のアドレスと送信する数量が含まれます
+        // Create a transaction that triggers the smart contract
+        // Here, the `transfer` method of the TRC20 contract is called to send tokens
+        // Parameters include the recipient's address and the amount to send
         $transaction = $this->tron->getTransactionBuilder()->triggerSmartContract(
             $contractAddress,
             'transfer(address,uint256)',
@@ -288,43 +286,41 @@ public function sendByDelegation($accountA, $accountC, $accountB, $amount)
                 ]
             ],
             $this->tron->address,
-            $contractABI   // ABI を呼び出しに追加
+            $contractABI  // Pass ABI in the call
         );
 
-        // トランザクションに署名する
+        // Sign the transaction
         $signedTransaction = $this->tron->signTransaction($transaction['transaction']);
 
-        // 署名されたトランザクションを送信する
+        // Send the signed transaction
         $response = $this->tron->sendRawTransaction($signedTransaction);
 
         return $response;
     }
 
-     /**
-     * TRC20 代理支払い：アカウントAのエネルギーを使用して、アカウントCがアカウントBに送金する
+    /**
+     * TRC20 Delegate Pay: Use Account A's energy to allow Account C to transfer to Account B
      *
-     * @param string $accountA 私的鍵 - トランザクションに署名してエネルギー費を支払うために使用されます
-     * @param string $accountC コントラクトアドレス - このアドレスからトークンが送られます
-     * @param string $accountB 受信アドレス - トークンがこのアドレスに送られます
-     * @param int $amount 送金額
-     * @return array トランザクションの結果を返す
+     * @param string $accountA Private key - used for signing transactions and paying energy fees
+     * @param string $accountC Contract address - tokens will be transferred from this address
+     * @param string $accountB Receiving address - tokens will be transferred to this address
+     * @param int $amount Transfer amount
+     * @return array Returns the transaction result
      */
     public function sendByDelegation($accountA, $accountC, $accountB, $amount)
     {
         try {
-            // アカウントAの私的鍵を設定する
+            // Set Account A's private key
             $this->tron->setPrivateKey($accountA);
 
-            // コントラクトの ABI を取得する
+            // Obtain the contract's ABI
             $contractABI = $this->getContractABI($accountC);
 
-            // アカウントCのコントラクト送金をトリガーするトラン
-
-ザクションを作成する
-            // 注意：ここで適切なコントラクトメソッドとパラメータが必要です
+            // Create a transaction that triggers Account C's contract transfer
+            // Note: Proper contract method and parameters are needed here
             $transaction = $this->tron->getTransactionBuilder()->triggerSmartContract(
                 $accountC,
-                'transfer(address,address,uint256)',  // ここで具体的なコントラクトメソッドとパラメータフォーマットが必要です
+                'transfer(address,address,uint256)',  // Specific contract method and parameter format needed here
                 '0',
                 [
                     ['type' => 'address', 'value' => $accountC],
@@ -332,39 +328,39 @@ public function sendByDelegation($accountA, $accountC, $accountB, $amount)
                     ['type' => 'uint256', 'value' => $amount]
                 ],
                 $this->tron->address,
-                $contractABI  // メソッド呼び出しに ABI 情報を追加
+                $contractABI  // Add ABI information to method call
             );
 
-            // トランザクションに署名する
+            // Sign the transaction
             $signedTransaction = $this->tron->signTransaction($transaction['transaction']);
 
-            // 署名されたトランザクションを送信する
+            // Send the signed transaction
             $result = $this->tron->sendRawTransaction($signedTransaction);
 
             return $result;
         } catch (Exception $e) {
-            return "エラー: " . $e->getMessage();
+            return "Error: " . $e->getMessage();
         }
     }
 
     /**
-     * コントラクトの ABI を取得する
+     * Get Contract's ABI
      *
-     * これは抽象的な例です。実際の実装では、TRON ネットワーク上の特定の API エンドポイントを呼び出す必要があるかもしれません
-     * @param string $contractAddress コントラクトアドレス
-     * @return array コントラクトの ABI を返します
+     * This is an abstract example; actual implementation may require calling a specific API endpoint on the TRON network
+     * @param string $contractAddress Contract address
+     * @return array Returns the contract's ABI
      * @throws Exception
      * @throws \IEXBase\TronAPI\Exception\TronException
      */
     private function getContractABI($contractAddress)
     {
-        // TRON ネットワーク API または他の方法を使用してコントラクトの ABI を取得する
+        // Use TRON network API or other means to obtain the contract's ABI
         $apiEndpoint = "https://api.trongrid.io/v1/contracts/{$contractAddress}/abi";
         $responseJson = file_get_contents($apiEndpoint);
         $responseData = json_decode($responseJson, true);
 
         if (!isset($responseData['data'][0]['abi'])) {
-            throw new Exception('指定されたコントラクトアドレスの ABI が見つかりません');
+            throw new Exception('ABI not found for the given contract address');
         }
 
         $contractABI = $responseData['data'][0]['abi'];
@@ -373,21 +369,21 @@ public function sendByDelegation($accountA, $accountC, $accountB, $amount)
     }
 ```
 
-これは抽象的な例です。実際の実装は異なる場合があります。例えば、TRON ネットワーク上の特定の API を使用してコントラクトの ABI を取得することができます。
+This is just an abstract example, and the actual implementation might differ. For instance, a specific API on the TRON network could be used to retrieve the contract's ABI.
 
 ## ABI
 
-ABI（Application Binary Interface、アプリケーションバイナリインターフェース）は、スマートコントラクトと外部アプリケーション間のインタラクションのためのインターフェースです。これは JSON オブジェクトであり、スマートコントラクトのメソッド、入力/出力パラメータのタイプ、パラメータの順序などの情報が含まれています。ABI を使用すると、外部アプリケーションはトランザクションデータを正確に構築し、スマートコントラクトの特定のメソッドを呼び出し、コントラクトの呼び出し結果を解析することができます。
+The ABI (Application Binary Interface) serves as the interface for interaction between smart contracts and external applications. It is represented as a JSON object, containing detailed information about the smart contract's methods, the types of input/output parameters, their order, and so forth. With the ABI, external applications can accurately construct transaction data, invoke specific methods of the smart contract, and parse the results of such calls.
 
-### ABI の主な役割：
+### Key Functions of ABI:
 
-1. **メソッド署名のマッピング**：ABI にはスマートコントラクトのメソッド署名が含まれており、外部アプリケーションがコントラクトの特定のメソッドをどのように呼び出すかを特定するのに役立ちます。
+1. **Method Signature Mapping**: The ABI includes the method signatures of the smart contract, assisting external applications in determining how to call specific contract methods.
 
-2. **タイプとデータの変換**：ABI はパラメータと戻り値のタイプ情報を提供し、外部アプリケーションが正確なタイプとデータ形式の変換を行うのに役立ちます。
+2. **Type and Data Conversion**: The ABI provides type information for parameters and return values, enabling external applications to carry out accurate type and data format conversions.
 
-3. **イベントの定義**：Ethereum や他のイベントをサポートするブロックチェーンに対して、ABI はコントラクトイベントの定義も含んでおり、外部アプリケーションがコントラクトイベントを解析し処理するのを助けます。
+3. **Event Definitions**: For blockchains like Ethereum that support events, the ABI also encapsulates the definitions of contract events, aiding external applications in parsing and handling these events.
 
-### ABI の簡単な例：
+### A Simple Example of ABI:
 
 ```json
 [
@@ -422,14 +418,14 @@ ABI（Application Binary Interface、アプリケーションバイナリイン�
 ]
 ```
 
-上記の ABI の例では、`setValue`と`getValue`という二つのメソッドが定義されています。`setValue`は`uint256`型の入力パラメータ`_value`を受け取り、出力はありません。`getValue`は入力パラメータがなく、`uint256`型の値を返します。
+In the above example of an ABI, two methods `setValue` and `getValue` are defined. `setValue` accepts a `uint256` type input parameter `_value` and has no output. `getValue`, on the other hand, takes no input parameters but returns a value of type `uint256`.
 
-### スマートコントラクトのインタラクションで ABI を使用する：
+### Using ABI in Smart Contract Interactions:
 
-1. **コントラクトメソッドの呼び出し**：外部アプリケーションは ABI を使用して、スマートコントラクトメソッドを呼び出すためのトランザクションデータを構築できます。
+1. **Invoking Contract Methods**: External applications can utilize the ABI to build transaction data for calling smart contract methods.
 
-2. **コントラクト呼び出し結果の解析**：コントラクトメソッドが呼び出された後、外部アプリケーションは ABI を使用してメソッド呼び出しの結果を解析し、可読な形式に変換できます。
+2. **Parsing Contract Call Results**: After a contract method is invoked, external applications can also employ the ABI to parse the results of the method call, converting them into a readable format.
 
-3. **コントラクトイベントの処理**：イベントをサポートするブロックチェーンに対して、外部アプリケーションは ABI を使用して、スマートコントラクトによってトリガーされたイベントを解析および処理することができます。
+3. **Handling Contract Events**: For blockchains that support events, external applications can leverage the ABI to parse and manage events triggered by smart contracts.
 
-したがって、TRON や Ethereum などの他のブロックチェーンにおいても、ABI は外部アプリケーションとスマートコントラクト間のインタラクションの重要な部分です。コントラクトを呼び出す際に、アプリケーションはトランザクションデータを正しく構築する方法、およびコントラクト呼び出しの結果を解析する方法を特定するために ABI が必要です。
+Hence, whether on TRON or other blockchains like Ethereum, the ABI is a critical component of the interaction between external applications and smart contracts. Applications require the ABI to determine how to correctly construct transaction data and to parse the results of contract calls.
